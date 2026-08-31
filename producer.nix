@@ -41,12 +41,14 @@
 #     hand, from the palette or the bar pill, which also means the trigger
 #     agent that polls those conditions never runs at all.
 #
-#   - No creative apps in the roster. Ableton, RX and Resolve are already
+#   - No apps in the roster at all. Ableton, RX and Resolve are already
 #     installed and already licensed. haus has nothing to add by taking over
 #     Homebrew's ownership of them, and `haus.homebrew.cleanup` is deliberately
 #     left at its default ("none") so that nothing undeclared is ever removed.
-#     IINA is the exception, and earns it: the reference footage is .mkv, which
-#     QuickTime cannot open at all.
+#     The reference rips are .mkv, which QuickTime cannot open — but the player
+#     that opens them is a roster entry for your own host file. haus does not
+#     pick one, and a desktop claiming thirteen file extensions on a machine it
+#     has never seen is the kind of reach this file exists to avoid.
 #
 #   - The sound settings are not decoration. A studio Mac's output is a pair of
 #     monitors or headphones at working level, so the Trash whoosh, the volume-
@@ -154,14 +156,6 @@
       # Without this, every `haus rebuild` stops and waits for a sudo password
       # in a terminal this person does not otherwise open.
       passwordlessRebuild = true;
-    };
-
-    # IINA, and the video extensions with it. The reference rips are .mkv and
-    # .avi, which QuickTime cannot open — this is the pick that removes an
-    # actual daily annoyance rather than an editorial preference.
-    apps.videoPlayer = {
-      enable = true;
-      claimFileTypes = true;
     };
 
     fonts.mono.baseSize = 19;
