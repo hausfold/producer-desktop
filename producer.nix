@@ -23,11 +23,11 @@
 #     as a login item, ⌘Space actually taken away from Spotlight, and the
 #     Accessibility grant surviving a rebuild.
 #
-#     Two of the palette's optional commands come with it, and they were picked
-#     by asking which System Settings pane this person opens mid-session. It is
-#     Sound, to move between the interface and the headphones, and Bluetooth,
-#     to wake a controller that has gone to sleep. Both are now a row in a
-#     window that is already open.
+#     Two of the palette's optional commands come with it, picked by asking
+#     what this person interrupts a session to go and do. It is moving between
+#     the interface and the headphones, and waking a controller that has gone
+#     to sleep. Both are a row in a window that is already open now, driving
+#     `SwitchAudioSource` and `blueutil` rather than opening a settings pane.
 #
 #   - Appearance ON, and scoped to what haus itself draws. This is the room
 #     that used to be half-set here by accident — an accent and a font size,
@@ -53,8 +53,10 @@
 #     each one moves a lever the other two don't. A workflow that reorganises
 #     itself every few months is not one to freeze into a config file, so none
 #     of them declares a `when` condition — they are entered by hand, from the
-#     palette or the bar pill, which also means the trigger agent that polls
-#     those conditions never runs at all.
+#     palette, which also means the trigger agent that polls those conditions
+#     never runs at all. Not from the bar's focus pill: its click is `focus
+#     toggle`, which can LEAVE a scene and can flip plain quiet, and has no
+#     route into a named one.
 #
 #   - Four apps, all free, and the thing they deliberately still don't do.
 #     Ableton, RX and Resolve are already installed and already licensed; haus
@@ -105,6 +107,11 @@
     # Two of the palette's optional commands. Each one installs the plain CLI it
     # shells out to (`audio` pulls switchaudio-osx, `bluetooth` pulls blueutil),
     # so neither is a row that fails with "not found".
+    #
+    # ⚠ A LIST, and a host that names `launcher.plugins` at all replaces it
+    # whole rather than adding to it — losing both rows AND switchaudio-osx
+    # with them, which is the tool the `studio` scene's `audio.input` wants.
+    # Restate these two beside your own.
     #
     # `caffeinate` is the third one that fits this machine and is deliberately
     # not here: the bar already carries the coffee pill below, and a second
@@ -172,24 +179,26 @@
     # clipping.
     theme.accent = "teal";
 
-    # Nebelung's palette, written into any app in the roster that it ships a
-    # port for. This is the appearance room's one real switch, and the reason
-    # it was off no longer holds: it used to be justified by "it writes theme
-    # files into lazygit, fzf and yazi, none of which this desktop installs",
-    # which was true of a roster with nothing in it.
+    # Nebelung's palette, written into any app in the roster that nebelung
+    # ships a port for. The Appearance room is always present rather than
+    # switched on, and this is the one leaf in it shaped like a switch; the
+    # reason it was off no longer holds. It read "it writes theme files into
+    # lazygit, fzf and yazi, none of which this desktop installs", which was
+    # true of a roster with nothing in it.
     #
-    # What it buys here is the seam rather than one app: add `zed`, `warp`,
-    # `vscode`, `telegram` or `qbittorrent` to `haus.roster` in your own host
-    # file and each one arrives already wearing these colours, with nothing
-    # further to configure. `haus doctor` lists which of them are placed and
-    # which are still waiting on a click in the app's own settings.
+    # Be exact about what it buys, because the option itself is: it drops a
+    # FILE. Whether the file SELECTS the theme is the app's call, not haus's —
+    # some ports are a path the app already reads, most want one more click,
+    # and a port whose install is a merge or a compile step is deliberately not
+    # written at all. `haus doctor` is the list of which is which.
     #
-    # One rough edge, named because it is the port this desktop's own roster
-    # hits: OBS is a two-file theme, and the port's `path` names only the first
-    # (`Catppuccin_Mocha.ovt`, which `extends` a base the second file carries).
-    # haus copies what `path` names, so the base `Catppuccin.obt` has to come
-    # across beside it from the same nebelung folder before OBS will offer the
-    # theme under Appearance.
+    # On this roster it is almost entirely future value, and that is the honest
+    # reason it is on: an app added to `haus.roster` later gets its theme
+    # placed without anyone making a second decision. OBS is the only app here
+    # nebelung draws, and its theme does not arrive complete — the port's
+    # `path` names `Catppuccin_Mocha.ovt`, which `extends` a base carried by a
+    # second file the port names only in prose, so OBS does not offer the theme
+    # under Appearance yet. Leave OBS stock for now; nothing else here changes.
     theme.ports.enable = true;
 
     # The desktop picture is yours. `none` is the room's own default and is
@@ -248,7 +257,7 @@
       };
 
       capture = {
-        description = "Screen recording — OBS up, nothing else allowed on screen";
+        description = "Screen recording — OBS up, and nothing allowed to interrupt";
         # The one scene where quiet is not a preference. A banner that arrives
         # mid-take is edited out afterwards or not at all.
         dnd = true;

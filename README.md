@@ -31,11 +31,11 @@ do](#what-it-deliberately-does-not-do).
 
 | Room | Why |
 |---|---|
-| **Launcher** (pounce), on ⌘Space | The palette. What the room adds over the standalone Homebrew install is wiring, not the app: the daemon as a login item, ⌘Space actually taken back from Spotlight, and the Accessibility grant surviving a rebuild. Drawn at 1.2, because you read it from the mix position rather than leaning over the keyboard. |
+| **Launcher** (pounce), on ⌘Space | The palette. What the room adds over the standalone Homebrew install is wiring, not the app: the daemon as a login item, and ⌘Space actually taken back from Spotlight. Drawn at 1.2, because you read it from the mix position rather than leaning over the keyboard. Making the Accessibility grant survive a rebuild takes one more line, and only your host file can carry it: see [the strong opinions](#the-strong-opinions-stated). |
 | **Shelf** (perch) | The notch becomes a place to park a rendered stem, a trimmed clip or a grabbed frame while you switch apps. Every step of a sound-redesign pass is a file moving between two applications that have no idea the other exists. New screenshots reach it too, once you have pointed perch at your screenshots folder (a one-time pick). |
-| **Focus**, with three scenes | `studio`: Do Not Disturb on, and the Mac stays awake through a long take or a long render. `capture`: the same quiet, and OBS comes up with it. `watch`: the display stays up through a two-hour film, notifications left exactly as they were. All three are entered by hand, from the palette or the bar pill. |
+| **Focus**, with three scenes | `studio`: Do Not Disturb on, and the Mac stays awake through a long take or a long render. `capture`: the same quiet, and OBS comes up with it. `watch`: the display stays up through a two-hour film, notifications left exactly as they were. All three are entered by hand, **from the palette**. The bar's focus pill is a plain quiet toggle: it can leave a scene, but it has no route into one. |
 | **Bar** | Clock, weather, battery, Wi-Fi and now-playing (the room's own defaults), plus volume, CPU, memory and a coffee pill. Spectral repair and a Resolve export are the two things on this machine worth watching a graph for. |
-| **Appearance** | Teal, and nebelung's palette written into any app in the roster it ships a theme for. Deliberately narrow: it colours what haus draws and the apps this desktop brought. It does **not** replace your desktop picture, and it does **not** touch macOS's own Light/Dark. |
+| **Appearance** | Not a room with a switch: it is always present, and what changed is that this desktop now decides it instead of grazing it. Teal, mono at 19, the sound and screenshot settings below, and `theme.ports` on so a themed app you add later is coloured without a second decision. Two deliberate refusals: it does **not** replace your desktop picture, and it does **not** touch macOS's own Light/Dark. |
 | **Touch ID**, including for `haus rebuild` | Without the second half, every rebuild stops and waits for a `sudo` password in a terminal you do not otherwise open. |
 
 ## What it installs
@@ -84,12 +84,26 @@ Things that will surprise muscle memory, or that reach further than a rebuild.
 - **⌥Space is claimed globally** for Find Files. It is free on a machine with no
   leader key, and it is exactly the chord `haus.keys.leader = "alt-space"`
   wants, so turning the tiler on later means moving one of the two.
-- **⌘Tab stops being the app switcher.** The launcher room replaces it with the
-  palette's window switcher, which walks *windows* rather than apps. On a Mac
-  running Ableton that is usually what you wanted, since a plug-in window and
-  the arrangement are two rows instead of one app. Tap to toggle, hold ⌘ and
-  keep tapping ⇥ to walk back, type while holding to filter. Put the stock one
-  back with `haus.launcher.windowSwitcher = false`.
+- **⌘Tab stops being the app switcher, once pounce has its Accessibility
+  grant.** The launcher room replaces it with the palette's window switcher,
+  which walks *windows* rather than apps. On a Mac running Ableton that is
+  usually what you wanted, since a plug-in window and the arrangement are two
+  rows instead of one app. Tap to toggle, hold ⌘ and keep tapping ⇥ to walk
+  back, type while holding to filter. It needs the grant to install its event
+  tap, so on a fresh machine stock ⌘Tab keeps working until you approve pounce
+  in Accessibility. Put the stock one back for good with
+  `haus.launcher.windowSwitcher = false`.
+
+**The Accessibility grant does not survive a rebuild on its own, and no desktop
+can fix that.** Every rebuild that moves pounce gives it a new code signature,
+and macOS keys the grant to the old one, so pounce goes quiet and ⌘Tab reverts
+until you approve it again. The fix is one line, and it is host-only because it
+names something in your login keychain:
+
+```nix
+# security find-identity -v -p codesigning
+haus.launcher.signingIdentity = "Developer ID Application: Your Name (TEAMID)";
+```
 
 **BlackHole installs a system audio driver, and that is the largest single claim
 in this file.** It is a virtual device, not a kernel extension, and it is the
@@ -98,23 +112,27 @@ before you rebuild:
 
 1. The cask runs a package installer, so the rebuild asks for **Touch ID** part
    way through. That is Homebrew, not haus.
-2. It adds **BlackHole 2ch** to your Sound settings. It does not select it. If
+2. Installing an audio plug-in restarts `coreaudiod`, so **audio drops out of
+   whatever is playing** at that moment. Don't rebuild mid-take.
+3. It adds **BlackHole 2ch** to your Sound settings. It does not select it. If
    you ever find yourself with silent monitors, that is the first list to look
    at.
-3. If you already run **Loopback** or **Audio Hijack**, you do not need it.
-   Delete the `roster.blackhole-2ch` line before the first rebuild.
+4. If you already run **Loopback** or **Audio Hijack**, you do not need it.
+   Delete the `roster.blackhole-2ch` line before the first rebuild. Backing it
+   out afterwards wants BlackHole's own uninstaller rather than
+   `brew uninstall` alone, because the driver lives outside `/Applications`.
 
 **IINA arrives without taking anything.** haus stopped claiming file types on
 your behalf, so `.mkv` still opens in whatever opens it today. Make IINA the
 default for a container you care about with Finder's Get Info ▸ Change All,
 once.
 
-**The OBS theme lands half-applied, and that is a known rough edge.** nebelung's
-OBS port is two files: the Mocha variant, and a base the variant extends. haus
-copies the first into `~/Library/Application Support/obs-studio/themes/` and not
-the second, so OBS will not offer the theme under Appearance until
-`Catppuccin.obt` is sitting beside it. `haus doctor` is where the machine tells
-you what it placed.
+**OBS stays stock, and that is a known rough edge rather than a setting.**
+nebelung's OBS theme is two files, a Mocha variant and the base it extends, and
+the port names only the first. haus copies what the port names, so the theme
+does not appear in OBS's Appearance list. Nothing is broken by this and nothing
+here needs doing: use OBS's own themes. `haus doctor` is where the machine
+lists what it placed and what is still waiting.
 
 **The rest, in the order you would notice them.**
 
@@ -140,19 +158,28 @@ you what it placed.
 default, because the absence of a line is not a promise anyone can read). So
 does macOS's own Light/Dark: `haus.theme.systemAppearance` is left unset.
 
-## The one list-typed option it sets
+## The three list-typed options it sets
 
-`haus.tour.steps`, a single step. A host that names `tour.steps` at all
-**replaces the list whole** rather than appending to it, so restate this entry
-if you add your own:
+A list in your host file **replaces the desktop's whole** rather than appending
+to it: your definition outranks the desktop's, and only the winning one
+survives. Nothing fails, you just quietly get fewer entries than you meant. If
+you set any of these, restate what is here beside your own.
 
 ```nix
-{ hint = "press {palette}, type ff, hit ↵ — that's Find Files, from anywhere"; detect = "palette"; }
+# Losing this one silently drops both palette rows AND switchaudio-osx from the
+# machine, which is the tool the `studio` scene's audio.input needs.
+haus.launcher.plugins = [ "audio" "bluetooth" ];
+
+haus.focus.scenes.capture.apps.open = [ "OBS" ];
+
+haus.tour.steps = [
+  { hint = "press {palette}, type ff, hit ↵ — that's Find Files, from anywhere"; detect = "palette"; }
+];
 ```
 
-One step is on purpose: with the tiler off, `palette` is the only signal the
-tour can detect, so a second step would either complete itself instantly or sit
-there waiting to be clicked past.
+One tour step is on purpose: with the tiler off, `palette` is the only signal
+the tour can detect, so a second step would either complete itself instantly or
+sit there waiting to be clicked past.
 
 ## What it deliberately does not do
 
@@ -184,19 +211,21 @@ there waiting to be clicked past.
 - **It sets no identity, no secrets and nothing about your hardware.** Those
   belong in your host file, which is the file that also beats every line here.
 
-## Two lines worth knowing about, not set here
+## Two more lines for your host file, not set here
 
-Both are one assignment in your own host file, and both are left out because
-they are about you rather than about a studio.
+Both are left out because they are about you rather than about a studio.
 
 ```nix
 # Stop the things haus itself animates: the bar's hover sweeps, the marquees.
 # It also asks for macOS's own Reduce Motion, which rewrites the web too.
 haus.appearance.reduceMotion = true;
 
-# Everything haus draws, bigger: the palette, the bar's type, the Dock's icons,
-# Finder's row height. `launcher.scale` above moves the palette alone.
+# Everything else haus draws, bigger: the bar's type, the Dock's icons,
+# Finder's row height. It will NOT move the palette on this desktop, because
+# `launcher.scale` is pinned at 1.2 here and a pinned value beats the default
+# ui.scale would set. Raise both, or drop the pin.
 haus.ui.scale = 1.35;
+haus.launcher.scale = 1.35;
 ```
 
 ## If you are coming from the Homebrew pounce
