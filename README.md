@@ -23,9 +23,9 @@ opens on top of it to repair a take, DaVinci Resolve bookends the session, and
 the browser is where the reference footage comes from. Not a developer, and not
 interested in becoming one to use their computer.
 
-It assumes you already own and have installed your creative apps. It installs
-none of them, on purpose. See [What it deliberately does not
-do](#what-it-deliberately-does-not-do).
+It assumes you already own and have installed your creative apps, and it leaves
+those alone. What it brings is four free tools that a studio Mac turns out to
+need anyway. See [What it installs](#what-it-installs).
 
 ## Rooms it turns on
 
@@ -183,9 +183,12 @@ sit there waiting to be clicked past.
 
 ## What it deliberately does not do
 
-- **It installs no creative apps.** Ableton, RX and Resolve are already on your
-  Mac and already licensed; haus has nothing to add by taking over Homebrew's
-  ownership of them.
+- **It does not touch your licensed apps.** Ableton, RX and Resolve are already
+  on your Mac and already paid for; haus has nothing to add by taking over
+  Homebrew's ownership of them, and `haus.homebrew.cleanup` stays at `"none"`,
+  so nothing you installed yourself is ever removed by a rebuild. The four in
+  [What it installs](#what-it-installs) are the other case: free, unlicensed,
+  and not a replacement for anything you run.
 - **It does not claim your file associations.** The reference rips are `.mkv`,
   which QuickTime cannot open, and IINA is here to open them. Which app *owns*
   the extension is still yours: this file used to hand IINA thirteen of them,
@@ -253,8 +256,8 @@ The daemon still discovers them there.
   `none`, `theme.systemAppearance` at `unmanaged`, and the OBS theme file
   placed.
 - **Rebuilt and driven on a real macOS install**, at the version of this file
-  that had no apps in it: the palette answers ⌘Space, ⌥Space opens Find Files,
-  the bar carries the four pills, and Caps Lock is left alone.
+  before the four apps were added: the palette answers ⌘Space, ⌥Space opens
+  Find Files, the bar carries the four pills, and Caps Lock is left alone.
 - **The four apps, the `capture` scene and the two palette commands have not
   been lived in.** They evaluate; nobody has yet watched Homebrew install a
   driver mid-rebuild.
