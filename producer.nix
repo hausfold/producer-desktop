@@ -23,10 +23,24 @@
 #     as a login item, ⌘Space actually taken away from Spotlight, and the
 #     Accessibility grant surviving a rebuild.
 #
+#     Two of the palette's optional commands come with it, and they were picked
+#     by asking which System Settings pane this person opens mid-session. It is
+#     Sound, to move between the interface and the headphones, and Bluetooth,
+#     to wake a controller that has gone to sleep. Both are now a row in a
+#     window that is already open.
+#
+#   - Appearance ON, and scoped to what haus itself draws. This is the room
+#     that used to be half-set here by accident — an accent and a font size,
+#     with the one switch it actually has left off. It is on now, and it is
+#     deliberately narrow: it colours the palette, the shelf, the bar and the
+#     apps in the roster below, and it touches nothing that was already on the
+#     screen when you installed it. `wallpaper.style = "none"` keeps the desktop
+#     picture, and `theme.systemAppearance` is left unset so macOS's own
+#     Light/Dark stays exactly where it was. A studio Mac is somebody's room; a
+#     config file gets to furnish it, not repaint it.
+#
 #   - Developer OFF, and AI with it. There is no shell toolbelt here, no coding
-#     agents, and no terminal room. `haus.theme.ports` is left off for the same
-#     reason `minimal` leaves it off — it writes theme files into lazygit, fzf
-#     and yazi, none of which this desktop installs.
+#     agents, and no terminal room.
 #
 #   - Shelf (perch) ON. The single most load-bearing room for this workflow and
 #     the one that needs the least explaining: the notch is a place to park a
@@ -34,21 +48,30 @@
 #     and every step of a sound-redesign pass is a file moving between two
 #     applications that have no idea the other exists.
 #
-#   - Focus ON, with two scenes rather than five. `studio` and `watch` below
-#     are the two states this machine is actually ever in. A workflow that
-#     reorganises itself every few months is not one to freeze into a config
-#     file, so neither scene declares a `when` condition — they are entered by
-#     hand, from the palette or the bar pill, which also means the trigger
-#     agent that polls those conditions never runs at all.
+#   - Focus ON, with three scenes rather than five. `studio`, `capture` and
+#     `watch` below are the three states this machine is actually ever in, and
+#     each one moves a lever the other two don't. A workflow that reorganises
+#     itself every few months is not one to freeze into a config file, so none
+#     of them declares a `when` condition — they are entered by hand, from the
+#     palette or the bar pill, which also means the trigger agent that polls
+#     those conditions never runs at all.
 #
-#   - No apps in the roster at all. Ableton, RX and Resolve are already
-#     installed and already licensed. haus has nothing to add by taking over
-#     Homebrew's ownership of them, and `haus.homebrew.cleanup` is deliberately
-#     left at its default ("none") so that nothing undeclared is ever removed.
-#     The reference rips are .mkv, which QuickTime cannot open — but the player
-#     that opens them is a roster entry for your own host file. haus does not
-#     pick one, and a desktop claiming thirteen file extensions on a machine it
-#     has never seen is the kind of reach this file exists to avoid.
+#   - Four apps, all free, and the thing they deliberately still don't do.
+#     Ableton, RX and Resolve are already installed and already licensed; haus
+#     has nothing to add by taking over Homebrew's ownership of them, and
+#     `haus.homebrew.cleanup` stays at its default ("none") so nothing
+#     undeclared is ever removed. What this desktop DOES bring is four free
+#     ones a studio Mac turns out to need and that nobody installs until the
+#     afternoon they are missing: a player for the containers QuickTime
+#     refuses, an unarchiver for the ones Finder refuses, a virtual audio
+#     device, and a recorder.
+#
+#     Not one of them CLAIMS anything, and that half is inherited rather than
+#     re-argued. This file used to hand IINA thirteen file associations, and
+#     the first rebuild put a stack of one modal per extension family in front
+#     of the person it was meant to be helping. Putting an app on the Mac is a
+#     desktop's business; deciding what opens your .mkv on a machine the
+#     desktop has never seen is not. Each of the four is one line to drop.
 #
 #   - The sound settings are not decoration. A studio Mac's output is a pair of
 #     monitors or headphones at working level, so the Trash whoosh, the volume-
@@ -72,6 +95,26 @@
 
     keys.palette = "cmd-space";
 
+    # The palette is read at arm's length from the mix position, not leaned
+    # over like a terminal — which is the case `launcher.scale` exists for, in
+    # its own option's words. Only the palette moves: `haus.ui.scale` would
+    # take the Dock's icons and Finder's row height with it, and those were
+    # already the size this person set them.
+    launcher.scale = 1.2;
+
+    # Two of the palette's optional commands. Each one installs the plain CLI it
+    # shells out to (`audio` pulls switchaudio-osx, `bluetooth` pulls blueutil),
+    # so neither is a row that fails with "not found".
+    #
+    # `caffeinate` is the third one that fits this machine and is deliberately
+    # not here: the bar already carries the coffee pill below, and a second
+    # front on the same toggle is a row you have to learn instead of a shortcut
+    # you already have.
+    launcher.plugins = [
+      "audio"
+      "bluetooth"
+    ];
+
     launcher.items = {
       # Find Files is the row this desktop's person already lives in, so it
       # gets a key of its own — ⌥Space, one modifier away from the palette it
@@ -85,9 +128,28 @@
         caption = "Find Files";
       };
 
-      # No key — the palette is one keystroke away, and this is a row you go
-      # looking for rather than reach for mid-take.
+      # No key — the palette is one keystroke away, and these are rows you go
+      # looking for rather than reach for mid-take. Two letters each, so the
+      # three panels this machine opens share one shape of shorthand.
       "mode:clipboard".alias = "cb";
+
+      # The recent-screenshots panel. On this Mac a screenshot is usually a
+      # reference frame pulled out of a film, so the panel is a contact sheet
+      # of the last hour's grabs and the fastest route back to one.
+      "mode:screenshots".alias = "ss";
+
+      # "Audio Devices" already matches a search for "audio". The alias buys
+      # the OTHER word people reach for when they want this window, which on a
+      # machine with an interface plugged into it is the microphone.
+      "cmd:audio".alias = "mic";
+
+      "cmd:bluetooth".alias = "bt";
+
+      # Homebrew's launchd services, listed on a Mac with no terminal on it and
+      # nothing a person here would ever want to restart. The row is hidden
+      # rather than the command removed: `listed = false` takes it out of the
+      # list and leaves it reachable by name if a host ever binds it.
+      "cmd:brew-services".listed = false;
     };
 
     # ---- the bar -----------------------------------------------------------
@@ -102,6 +164,46 @@
       # coffee pill is the manual version of what the `studio` scene does.
       caffeinate = true;
     };
+
+    # ---- appearance --------------------------------------------------------
+
+    # Teal rather than haus's own mauve: it is the one accent that stays
+    # legible against the ambers and reds every DAW uses for clips and
+    # clipping.
+    theme.accent = "teal";
+
+    # Nebelung's palette, written into any app in the roster that it ships a
+    # port for. This is the appearance room's one real switch, and the reason
+    # it was off no longer holds: it used to be justified by "it writes theme
+    # files into lazygit, fzf and yazi, none of which this desktop installs",
+    # which was true of a roster with nothing in it.
+    #
+    # What it buys here is the seam rather than one app: add `zed`, `warp`,
+    # `vscode`, `telegram` or `qbittorrent` to `haus.roster` in your own host
+    # file and each one arrives already wearing these colours, with nothing
+    # further to configure. `haus doctor` lists which of them are placed and
+    # which are still waiting on a click in the app's own settings.
+    #
+    # One rough edge, named because it is the port this desktop's own roster
+    # hits: OBS is a two-file theme, and the port's `path` names only the first
+    # (`Catppuccin_Mocha.ovt`, which `extends` a base the second file carries).
+    # haus copies what `path` names, so the base `Catppuccin.obt` has to come
+    # across beside it from the same nebelung folder before OBS will offer the
+    # theme under Appearance.
+    theme.ports.enable = true;
+
+    # The desktop picture is yours. `none` is the room's own default and is
+    # stated anyway, because the absence of a line is not a promise anyone can
+    # read: this is the most visible thing the layer can do to a Mac, and a
+    # desktop that quietly did it would be the one thing here that could not be
+    # undone by reading the file first.
+    #
+    # `theme.systemAppearance` is left unset for the same reason and gets no
+    # line at all: macOS's own Light/Dark is a switch this person already threw
+    # once, and a rebuild has no business throwing it back.
+    wallpaper.style = "none";
+
+    fonts.mono.baseSize = 19;
 
     # ---- sound -------------------------------------------------------------
 
@@ -125,6 +227,11 @@
       # floating preview waits around. Grabbing a run of reference frames is a
       # burst, not a single capture — and with the shelf on, the file reaching
       # the notch IS the preview.
+      #
+      # The shelf room already asks for this at `mkDefault` while
+      # `watchScreenshots` is on. It is pinned here rather than left to it so
+      # that turning the watch off doesn't silently bring the five seconds
+      # back: the burst is this desktop's reason, and it outlives the shelf's.
       thumbnail = false;
     };
 
@@ -140,6 +247,22 @@
         # yours in your host file — see the README.
       };
 
+      capture = {
+        description = "Screen recording — OBS up, nothing else allowed on screen";
+        # The one scene where quiet is not a preference. A banner that arrives
+        # mid-take is edited out afterwards or not at all.
+        dnd = true;
+        preventSleep = true;
+        # The scene earns its place by opening the app rather than by being a
+        # third mood: OBS is in the roster below, so this is a name the desktop
+        # can be sure of.
+        apps.open = [ "OBS" ];
+        # Closes only what the scene actually started, and asks the way ⌘Q
+        # asks — so an OBS you already had open, recording, is never taken
+        # down by leaving.
+        apps.closeOnExit = true;
+      };
+
       watch = {
         description = "Hunting scenes — the display stays up through a two-hour film";
         # false means "leave Do Not Disturb exactly as you found it", not "turn
@@ -149,6 +272,36 @@
       };
     };
 
+    # ---- the four apps -----------------------------------------------------
+    #
+    # Roster entries with a source and nothing else. None claims a leader letter
+    # (there is no leader on this machine) and none names a bundle id (that
+    # field feeds the tiler's placement rules, and the tiler is off) — so each
+    # of these is exactly one sentence: put this on the Mac.
+    #
+    # `haus.homebrew.adopt` is on by default, so a copy you already installed by
+    # hand is adopted rather than fought over or installed twice.
+
+    # The reference rips are .mkv and .avi, which QuickTime cannot open at all.
+    # haus stopped claiming file types on your behalf, so IINA arrives without
+    # taking anything: make it the default for a container you care about with
+    # Finder's Get Info ▸ Change All, once.
+    roster.iina.cask = "iina";
+
+    # Sample packs and sound libraries arrive as .rar and .7z, neither of which
+    # Finder opens. The same shape of argument as IINA, one folder earlier.
+    roster.keka.cask = "keka";
+
+    # A virtual audio device: the only way to get what a browser is playing
+    # into a DAW input. It installs a system audio driver, which is the largest
+    # single claim in this file — read the README's strong opinions before you
+    # rebuild, and drop this line if you already run Loopback or Audio Hijack.
+    roster.blackhole-2ch.cask = "blackhole-2ch";
+
+    # Screen and session capture, and the one app here nebelung has a theme
+    # for — see `theme.ports.enable` above.
+    roster.obs.cask = "obs";
+
     # ---- the rest ----------------------------------------------------------
 
     security.touchId = {
@@ -157,15 +310,6 @@
       # in a terminal this person does not otherwise open.
       passwordlessRebuild = true;
     };
-
-    fonts.mono.baseSize = 19;
-
-    # Teal rather than haus's own mauve: it is the one accent that stays
-    # legible against the ambers and reds every DAW uses for clips and
-    # clipping. `theme.ports` stays off — see the header.
-    theme.accent = "teal";
-
-    wallpaper.style = "minimal";
 
     # One step, and one on purpose. With the tiler off, `palette` is the only
     # signal the tour can actually detect, so a second step would either

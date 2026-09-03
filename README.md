@@ -1,7 +1,7 @@
-# producer — a haus desktop for people who make sound
+# producer: a haus desktop for people who make sound
 
 A [haus](https://hausfold.co/haus) **desktop**: one data-only file that says what
-a Mac should feel like. Read `producer.nix` — it is the whole thing, it installs
+a Mac should feel like. Read `producer.nix`. It is the whole thing, it installs
 nothing on its own, and it cannot run code.
 
 ```sh
@@ -10,37 +10,57 @@ haus add  github:hausfold/producer-desktop     # pin it and select it
 haus rebuild
 ```
 
-> **Needs haus `v2026.08.25` or newer** — that is where a desktop may set
-> `haus.launcher.items` at all. On anything older, `haus show` refuses this file
-> with *"is not a plain item id"*. Run `haus update` first, or delete the
-> `launcher.items` block from `producer.nix` and keep everything else.
+> **Needs haus `v2026.09.02` or newer** — that is where `haus.launcher.plugins`
+> arrived. On anything older, `haus show` refuses this file with
+> *"haus.launcher.plugins is not a haus option"*. Run `haus update` first, or
+> delete the `launcher.plugins` block from `producer.nix` and keep everything
+> else.
 
 ## Who it's for
 
 Someone whose Mac is a studio. Ableton Live is open most of the day, iZotope RX
 opens on top of it to repair a take, DaVinci Resolve bookends the session, and
 the browser is where the reference footage comes from. Not a developer, and not
-interested in becoming one in order to use their computer.
+interested in becoming one to use their computer.
 
 It assumes you already own and have installed your creative apps. It installs
-none of them, on purpose — see [What it deliberately does not
+none of them, on purpose. See [What it deliberately does not
 do](#what-it-deliberately-does-not-do).
 
 ## Rooms it turns on
 
 | Room | Why |
 |---|---|
-| **Launcher** (pounce), on ⌘Space | The palette. What the room adds over the standalone Homebrew install is wiring, not the app: the daemon as a login item, ⌘Space actually taken back from Spotlight, and the Accessibility grant surviving a rebuild. Find Files gets the alias `ff` and a key of its own, **⌥Space**; clipboard history gets `cb`. |
+| **Launcher** (pounce), on ⌘Space | The palette. What the room adds over the standalone Homebrew install is wiring, not the app: the daemon as a login item, ⌘Space actually taken back from Spotlight, and the Accessibility grant surviving a rebuild. Drawn at 1.2, because you read it from the mix position rather than leaning over the keyboard. |
 | **Shelf** (perch) | The notch becomes a place to park a rendered stem, a trimmed clip or a grabbed frame while you switch apps. Every step of a sound-redesign pass is a file moving between two applications that have no idea the other exists. New screenshots reach it too, once you have pointed perch at your screenshots folder (a one-time pick). |
-| **Focus**, with two scenes | `studio` — Do Not Disturb on, and the Mac stays awake through a long take or a long render. `watch` — the display stays up through a two-hour film, notifications left exactly as they were. Both are entered by hand, from the palette or the bar pill. |
+| **Focus**, with three scenes | `studio`: Do Not Disturb on, and the Mac stays awake through a long take or a long render. `capture`: the same quiet, and OBS comes up with it. `watch`: the display stays up through a two-hour film, notifications left exactly as they were. All three are entered by hand, from the palette or the bar pill. |
 | **Bar** | Clock, weather, battery, Wi-Fi and now-playing (the room's own defaults), plus volume, CPU, memory and a coffee pill. Spectral repair and a Resolve export are the two things on this machine worth watching a graph for. |
+| **Appearance** | Teal, and nebelung's palette written into any app in the roster it ships a theme for. Deliberately narrow: it colours what haus draws and the apps this desktop brought. It does **not** replace your desktop picture, and it does **not** touch macOS's own Light/Dark. |
 | **Touch ID**, including for `haus rebuild` | Without the second half, every rebuild stops and waits for a `sudo` password in a terminal you do not otherwise open. |
+
+## What it installs
+
+Four apps, all free, none of them creative. The rule that picked them: a studio
+Mac turns out to need each one, and nobody installs it until the afternoon it is
+missing.
+
+| App | The gap it fills |
+|---|---|
+| **IINA** | The reference rips are `.mkv` and `.avi`, which QuickTime cannot open at all. |
+| **Keka** | Sample packs and sound libraries arrive as `.rar` and `.7z`. Finder opens neither. |
+| **BlackHole 2ch** | A virtual audio device. The only way to get what a browser is playing into a DAW input. Read [the strong opinions](#the-strong-opinions-stated) before this one. |
+| **OBS** | Screen and session capture, and the app the `capture` focus scene opens. |
+
+Already have one of them? `haus.homebrew.adopt` is on by default, so an existing
+copy is adopted rather than fought over or installed twice. Don't want one? Drop
+its line. `haus.homebrew.cleanup` stays at `"none"`, so nothing you installed
+yourself is ever removed by a rebuild.
 
 ## Rooms it deliberately leaves off
 
 This is the half you cannot reconstruct from the file.
 
-- **Windows — the tiler, and with it the leader key.** The decision that
+- **Windows, the tiler, and with it the leader key.** The decision that
   determines whether this feels like a gift or a hijacking. Ableton, RX and
   Resolve are full-screen, single-window applications with dense keyboard
   vocabularies of their own; tiling has nothing to arrange, and remapping
@@ -49,25 +69,55 @@ This is the half you cannot reconstruct from the file.
   Caps Lock stays Caps Lock.
 - **Development, and AI with it.** No shell toolbelt, no coding agents, no
   terminal room. AI follows development rather than leading it.
-- **`theme.ports`.** It writes theme files into lazygit, fzf and yazi — none of
-  which this desktop installs. Same reason haus's own `minimal` leaves it off.
-- **Zen (the browser).** Which browser you use is not a desktop's business.
+- **Zen, the browser.** Which browser you use is not a desktop's business.
 
 Turn any of them on in your host file with a plain assignment. Nothing here
 needs `lib.mkForce` to override.
 
 ## The strong opinions, stated
 
-Things that will surprise muscle memory, or that reach further than a rebuild:
+Things that will surprise muscle memory, or that reach further than a rebuild.
+
+**Three keys change hands.**
 
 - **⌘Space is taken from Spotlight** and given to the palette.
 - **⌥Space is claimed globally** for Find Files. It is free on a machine with no
-  leader key — and it is exactly the chord `haus.keys.leader = "alt-space"`
+  leader key, and it is exactly the chord `haus.keys.leader = "alt-space"`
   wants, so turning the tiler on later means moving one of the two.
-- **The desktop picture is replaced** with the generated haus look. Your current
-  one is not deleted, but macOS keeps no record of it — set
-  `haus.wallpaper.style = "none"` in your host before the first rebuild if you
-  want to keep yours.
+- **⌘Tab stops being the app switcher.** The launcher room replaces it with the
+  palette's window switcher, which walks *windows* rather than apps. On a Mac
+  running Ableton that is usually what you wanted, since a plug-in window and
+  the arrangement are two rows instead of one app. Tap to toggle, hold ⌘ and
+  keep tapping ⇥ to walk back, type while holding to filter. Put the stock one
+  back with `haus.launcher.windowSwitcher = false`.
+
+**BlackHole installs a system audio driver, and that is the largest single claim
+in this file.** It is a virtual device, not a kernel extension, and it is the
+one the rest of the Mac audio world assumes you have. Three things to know
+before you rebuild:
+
+1. The cask runs a package installer, so the rebuild asks for **Touch ID** part
+   way through. That is Homebrew, not haus.
+2. It adds **BlackHole 2ch** to your Sound settings. It does not select it. If
+   you ever find yourself with silent monitors, that is the first list to look
+   at.
+3. If you already run **Loopback** or **Audio Hijack**, you do not need it.
+   Delete the `roster.blackhole-2ch` line before the first rebuild.
+
+**IINA arrives without taking anything.** haus stopped claiming file types on
+your behalf, so `.mkv` still opens in whatever opens it today. Make IINA the
+default for a container you care about with Finder's Get Info ▸ Change All,
+once.
+
+**The OBS theme lands half-applied, and that is a known rough edge.** nebelung's
+OBS port is two files: the Mocha variant, and a base the variant extends. haus
+copies the first into `~/Library/Application Support/obs-studio/themes/` and not
+the second, so OBS will not offer the theme under Appearance until
+`Catppuccin.obt` is sitting beside it. `haus doctor` is where the machine tells
+you what it placed.
+
+**The rest, in the order you would notice them.**
+
 - **The startup chime is silenced.** This one is firmware state (`nvram
   StartupMute`), not a preference: it survives an OS reinstall and a wiped home
   directory. A Mac booting at full chime volume with the monitors up is the
@@ -79,13 +129,20 @@ Things that will surprise muscle memory, or that reach further than a rebuild:
   sound.
 - **The screenshot preview thumbnail is off**, so captures write immediately.
   With the shelf on, the file arriving in the notch *is* the preview.
-- The monospace size is set to 19 and the accent colour to **teal** — the one
-  accent that stays legible against the ambers and reds every DAW uses for clips
-  and for clipping.
+- **Homebrew's services row is hidden from the palette.** The command is still
+  there, it is just not in the list on a Mac with no terminal on it.
+- The palette is drawn at **1.2**, the monospace size is **19**, and the accent
+  colour is **teal**, the one accent that stays legible against the ambers and
+  reds every DAW uses for clips and for clipping.
+
+**What it explicitly does not touch.** Your desktop picture stays where it is
+(`haus.wallpaper.style = "none"`, stated in the file rather than left to a
+default, because the absence of a line is not a promise anyone can read). So
+does macOS's own Light/Dark: `haus.theme.systemAppearance` is left unset.
 
 ## The one list-typed option it sets
 
-`haus.tour.steps` — a single step. A host that names `tour.steps` at all
+`haus.tour.steps`, a single step. A host that names `tour.steps` at all
 **replaces the list whole** rather than appending to it, so restate this entry
 if you add your own:
 
@@ -99,15 +156,16 @@ there waiting to be clicked past.
 
 ## What it deliberately does not do
 
-- **It installs no applications at all.** Ableton, RX and Resolve are already on
-  your Mac and already licensed; haus has nothing to add by taking over
-  Homebrew's ownership of them. `haus.homebrew.cleanup` is left at its default
-  (`"none"`), so nothing you installed yourself is ever removed by a rebuild.
-- **It does not pick your video player.** The reference rips are `.mkv`, which
-  QuickTime cannot open — but which player opens them, and whether it claims
-  the extensions, is a roster entry for your own host file. A desktop reaching
-  for thirteen file associations on a machine it has never seen is exactly the
-  kind of change this file is built not to make.
+- **It installs no creative apps.** Ableton, RX and Resolve are already on your
+  Mac and already licensed; haus has nothing to add by taking over Homebrew's
+  ownership of them.
+- **It does not claim your file associations.** The reference rips are `.mkv`,
+  which QuickTime cannot open, and IINA is here to open them. Which app *owns*
+  the extension is still yours: this file used to hand IINA thirteen of them,
+  and the first rebuild put a stack of one modal per extension family in front
+  of the person it was meant to be helping. A desktop reaching that far into a
+  machine it has never seen is the kind of change this file is built not to
+  make.
 - **It does not name your audio interface.** Which box is plugged in is a fact
   about one machine, not a taste a desktop can share. The `studio` scene will
   switch the system input for you once you name it in your host:
@@ -116,12 +174,30 @@ there waiting to be clicked past.
   # the exact string `SwitchAudioSource -a -t input` prints
   haus.focus.scenes.studio.audio.input = "Scarlett 2i2 USB";
   ```
+
+  `SwitchAudioSource` is already on this machine: the `audio` palette command
+  brings it, and so does the scene the moment you name a device.
 - **It grants no permissions.** After the first rebuild, macOS will ask for
   Accessibility for pounce, and perch needs you to pick your screenshots folder
   once so it can mint the security-scoped bookmark for it. Nothing declarative
   can do either for you.
 - **It sets no identity, no secrets and nothing about your hardware.** Those
   belong in your host file, which is the file that also beats every line here.
+
+## Two lines worth knowing about, not set here
+
+Both are one assignment in your own host file, and both are left out because
+they are about you rather than about a studio.
+
+```nix
+# Stop the things haus itself animates: the bar's hover sweeps, the marquees.
+# It also asks for macOS's own Reduce Motion, which rewrites the web too.
+haus.appearance.reduceMotion = true;
+
+# Everything haus draws, bigger: the palette, the bar's type, the Dock's icons,
+# Finder's row height. `launcher.scale` above moves the palette alone.
+haus.ui.scale = 1.35;
+```
 
 ## If you are coming from the Homebrew pounce
 
@@ -133,22 +209,27 @@ brew services stop pounce
 brew uninstall pounce
 ```
 
-Your own commands in `~/.config/pounce/commands` are untouched by any of this —
-the daemon still discovers them there.
+Your own commands in `~/.config/pounce/commands` are untouched by any of this.
+The daemon still discovers them there.
 
 ## Tested against
 
-- haus `v2026.08.25` and newer.
-- `haus show ./producer.nix` passes: **a desktop — data only, and haus checked
-  it**.
-- A real host evaluates: a consumer flake pinning this file as a `flake = false`
-  input and selecting it through `mkHaus` resolves a full
-  `system.build.toplevel`, with a host's own
-  `focus.scenes.studio.audio.input` overriding it as designed.
-- Rebuilt and driven on a real macOS install: the palette answers ⌘Space, ⌥Space
-  opens Find Files, the bar carries the four pills this file adds, and Caps Lock
-  is left alone.
+- haus `v2026.09.02` and newer. Checked against `f48f9125`, `VERSION`
+  2026.09.03.
+- `haus show ./producer.nix` passes: **a desktop, data only, and haus checked
+  it**, 47 options across 7 rooms.
+- A real host evaluates. A consumer flake selecting this file through `mkHaus`
+  resolves a full `system.build.toplevel` with no failed assertions and no
+  warnings: all four casks in the resolved Homebrew list, `wallpaper.style` at
+  `none`, `theme.systemAppearance` at `unmanaged`, and the OBS theme file
+  placed.
+- **Rebuilt and driven on a real macOS install**, at the version of this file
+  that had no apps in it: the palette answers ⌘Space, ⌥Space opens Find Files,
+  the bar carries the four pills, and Caps Lock is left alone.
+- **The four apps, the `capture` scene and the two palette commands have not
+  been lived in.** They evaluate; nobody has yet watched Homebrew install a
+  driver mid-rebuild.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT. See [LICENSE](./LICENSE).
